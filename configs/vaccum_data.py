@@ -1,4 +1,4 @@
-dataset_type = 'DataFactoryDataset'
+dataset_type = 'VaccumDataset'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 
@@ -30,36 +30,28 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=3,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        dataset_name='cc',
+        dataset_name='robot',
         data_split='all',
-        order_by_sequence=True,
-        skip_vms_signs=False,
-        filter_empty_frames=True,
         split='train',
         split_ratio=0.85,
         seed=42,
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        dataset_name='cc',
+        dataset_name='robot',
         data_split='all',
-        order_by_sequence=True,
-        skip_vms_signs=False,
-        filter_empty_frames=True,
         split='val',
         split_ratio=0.85,
         seed=42,
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        dataset_name='cc',
+        dataset_name='robot',
         data_split='all',
-        order_by_sequence=True,
-        filter_empty_frames=True,
         split='test',
         split_ratio=0.85,
         seed=42,

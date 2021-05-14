@@ -1,6 +1,6 @@
 _base_ = [
     '../mmdetection/configs/retinanet/retinanet_x101_64x4d_fpn_1x_coco.py',
-    './cc_rsr_dataset.py',
+    './vaccum_data.py',
 ]
 
 
