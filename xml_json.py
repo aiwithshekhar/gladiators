@@ -12,7 +12,7 @@ def xml2csv(xml_path, result):
     Args:
         xml_path (str): Location of annotated XML file
     Returns:
-        pd.DataFrame: converted csv file
+        pd.DataFrame: converted json file
 
     """
     print("xml to csv {}".format(xml_path))
