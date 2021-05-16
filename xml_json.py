@@ -5,8 +5,9 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 import glob
 import json
+import argparse
 
-def xml2csv(xml_path, result):
+def xml2csv(xml_path, result, img_dir):
     """Convert XML to CSV
 
     Args:
@@ -33,10 +34,10 @@ def xml2csv(xml_path, result):
                      int(member[4][3].text)
             ]
             print (value)
-            if result.get(os.path.join('dataset/check',root.find('filename').text)) == None:
-                result[os.path.join('dataset/check',root.find('filename').text)]=[value]
+            if result.get(os.path.join(img_dir,root.find('filename').text)) == None:
+                result[os.path.join(img_dir,root.find('filename').text)]=[value]
             else:
-                result.get(os.path.join('dataset/check',root.find('filename').text)).append(value)
+                result.get(os.path.join(img_dir,root.find('filename').text)).append(value)
 
     except Exception as e:
         print('xml conversion failed:{}'.format(e))
@@ -44,10 +45,32 @@ def xml2csv(xml_path, result):
     return xml_df
 
 
-xml_files = glob.glob("/home/heh3kor/vaccum_thon/dataset/check/*.xml")
-result = defaultdict(list)
-for single_xml in xml_files:
-    save_info = xml2csv(single_xml, result)
+def _parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, required=False,
+                        default='/home/heh3kor/vaccum_thon/dataset/Scene_1_selected',
+                        help="Path to the sequence.")
+    parser.add_argument('--out_json_path', type=str, required=False,
+                        default='/home/heh3kor/vaccum_thon/dataset/Scene_2_selected.json',
+                        help="Output directory.")
 
-with open('/home/heh3kor/vaccum_thon/dataset/check/check.json', 'w') as outfile:
-    json.dump(result, outfile)
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = _parse_args()
+
+    img_dir = '/'.join(args.data_dir.split('/')[4:])
+
+    xml_files = glob.glob(f"{args.data_dir}/*.xml")
+    result = defaultdict(list)
+    for single_xml in xml_files:
+        save_info = xml2csv(single_xml, result, img_dir)
+
+    with open(args.out_json_path, 'w') as outfile:
+        json.dump(result, outfile)
+
+
+if __name__ == '__main__':
+    main()

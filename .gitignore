@@ -139,3 +139,5 @@ cython_debug/
 .vscode/
 work_dirs/
 dataset/
+test/
+test_output.png

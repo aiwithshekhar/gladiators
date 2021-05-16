@@ -9,11 +9,11 @@ from .custom import CustomDataset
 @DATASETS.register_module()
 class VaccumDataset(CustomDataset):
 
-    CLASSES = ("furniture", "door", "cabel", "sock")
+    CLASSES = ("furniture", "door", "cabels", "socks")
     
     def __init__(self, *args, **kwargs):
         np.random.seed(kwargs.pop('seed'))
-        path = 'dataset/check/check.json'
+        path = 'dataset/Scene_1_selected.json'
         with open(path) as json_file:
             self._dl = json.load(json_file)
         kwargs.pop('dataset_name')
@@ -34,7 +34,7 @@ class VaccumDataset(CustomDataset):
         idx = idx[:num_train_samples] if self._split == 'train' else idx[num_train_samples:]
         
         samples = []
-        mapping = {"furniture":0, "door":1, "cabel":2, "sock":3}
+        mapping = {"furniture":0, "door":1, "cabels":2, "socks":3}
         for i in tqdm(idx):
             frame_info = self._dl[frames[i]]
             

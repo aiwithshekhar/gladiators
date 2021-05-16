@@ -1,0 +1,10 @@
+# Configuration file for data loaders and data parsers etc.
+# See https://github.com/toml-lang/toml/blob/master/README.md for further example syntax of TOML.
+# Recommendation: Install TOML highlighter in your IDE/code-editor for opening this file to be able to see better.
+
+
+mode = 'deploy'
+
+model_cfg = 'configs/vaccum_retinanet.py'
+
+trained_weights = 'work_dirs/vaccum_retinanet/epoch_100.pth'

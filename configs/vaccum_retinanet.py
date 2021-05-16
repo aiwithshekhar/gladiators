@@ -1,5 +1,5 @@
 _base_ = [
-    '../mmdetection/configs/retinanet/retinanet_x101_64x4d_fpn_1x_coco.py',
+    '../mmdetection/configs/retinanet/retinanet_r50_fpn_1x_coco.py',
     './vaccum_data.py',
 ]
 
@@ -53,7 +53,7 @@ log_config = dict(
         dict(type='TensorboardLoggerHook')
     ])
 
-load_from = "https://open-mmlab.s3.ap-northeast-2.amazonaws.com/mmdetection/v2.0/retinanet/retinanet_x101_64x4d_fpn_1x_coco/retinanet_x101_64x4d_fpn_1x_coco_20200130-366f5af1.pth"
+load_from = "http://download.openmmlab.com/mmdetection/v2.0/retinanet/retinanet_r50_fpn_1x_coco/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth"
 fp16 = dict(loss_scale=512.)
 
 test_cfg = dict(
