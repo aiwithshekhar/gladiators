@@ -34,8 +34,8 @@ def main():
                       result,
                       labels=list(range(len(result))),
                       class_names=("furniture", "door", "cabels", "socks"),
-                      thickness=1,
-                      font_scale=0.35,
+                      thickness=2,
+                      font_scale=1,
                       out_file='./test_output.png')
 
 

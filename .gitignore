@@ -141,3 +141,6 @@ work_dirs/
 dataset/
 test/
 test_output.png
+*.jpg
+*.png
+output_videos/

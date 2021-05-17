@@ -32,18 +32,24 @@ class Detector:
         all_boxes = np.array([all_boxes[i][mask[i]] for i in range(len(all_boxes))])
         all_scores = np.array([all_scores[i][mask[i]] for i in range(len(all_boxes))])
 
-
         # Handles the scenario when there are no detections
-        for i in range(all_boxes.shape[0]):
-            if all_boxes[i].shape[0] == 0:
-                all_boxes[i] = ( -1 * np.ones([1, 4]))
-                all_scores[i] = ( np.zeros([1, 1]))
-                # boxes = -1 * np.ones([1, 4])
-                # scores = np.zeros([1, 1])
-            else:
-                all_scores[i] = np.expand_dims(all_scores[i], axis=1)
+        if len(all_boxes.shape) == 1:
 
-        detections = {'boxes': all_boxes, 'scores': all_scores}
+            for i in range(all_boxes.shape[0]):
+                if all_boxes[i].shape[0] == 0:
+                    all_boxes[i] = ( -1 * np.ones([1, 4]))
+                    all_scores[i] = ( np.zeros([1, 1]))
+
+                else:
+                    all_scores[i] = np.expand_dims(all_scores[i], axis=1)
+
+            detections = {'boxes': all_boxes, 'scores': all_scores}
+        else:
+
+            for i in range(all_boxes.shape[0]):
+                all_boxes = np.array([-1 * np.ones([1, 4]) for i in range(4)])
+                all_scores = np.array([np.zeros([1,1]) for i in range(4)])
+            detections = {'boxes': all_boxes, 'scores': all_scores}
         return detections
 
     def get_detections(self, image_list, score_threshold):

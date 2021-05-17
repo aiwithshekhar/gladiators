@@ -7,54 +7,72 @@ import cv2
 import mmcv
 import numpy as np
 
-from object_detection.detector import Detector
-from object_detection.detector_config import get_config
-from object_detection.utils import imshow_det_bboxes
+from detector import Detector
+from detector_config import get_config
+from utils import imshow_det_bboxes
 
 
-def make_video(detector, frames, outdir, score_threshold=0.35, fps=15, w=1424, h=800):
-    frames = sorted(frames)
-    seq_name = os.path.splitext(os.path.basename(frames[0]))[0]
-    seq_name = seq_name.split('_fnum')[0]
+def make_video(detector, inp_vid_path, outdir, score_threshold=0.45, fps=15, w=1280, h=720):
+
+    seq_name = inp_vid_path.split('/')[-1][:-4]+"_detector"
+
 
     if not os.path.exists(outdir):
         os.mkdir(outdir)
 
     output_video = os.path.join(outdir, seq_name + '.avi')
+
+    cap = cv2.VideoCapture(inp_vid_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
     out = cv2.VideoWriter(output_video, cv2.VideoWriter_fourcc(*"MJPG"), fps,
                           (w, h))
+    count = 0
+    num_warmup = 5
+    pure_inf_time = 0
 
-    for i, frame_read in enumerate(frames):
+    while True:
         prev_time = time.time()
-        frame_read = mmcv.imread(frame_read)
-        if frame_read is None:
-            continue
-        frame_read = mmcv.imresize(frame_read, (w, h))
-        result = detector.get_detections(frame_read, score_threshold)
+        ret, frame_read = cap.read()
 
-        result = np.concatenate([result[0]['boxes'], result[0]['scores']],
-                                axis=-1)
+        if ret:
+            if not frame_read.shape == (1280,720):
+                frame_read = mmcv.imresize(frame_read, (w, h))
+            result = detector.get_detections(frame_read, score_threshold)
 
-        image = imshow_det_bboxes(frame_read,
-                                  result,
-                                  labels=np.zeros(len(result), dtype='int32'),
-                                  class_names=('road_sign',),
-                                  thickness=1,
-                                  font_scale=0.35)
-        out.write(image)
-        print('\rProcessing frame: {}/{} | Current FPS: {}'.format(
-            i + 1, len(frames), np.round(1 / (time.time() - prev_time), 3)),
-              end='')
+            result = [np.concatenate([result[0]['boxes'][j],
+                                    result[0]['scores'][j]],
+                                    axis=-1) for j in range(len(result[0]['boxes']))]
+
+            image = imshow_det_bboxes(frame_read,
+                                    result,
+                                    labels=list(range(len(result))),
+                                    class_names=("furniture", "door", "cabels", "socks"),
+                                    thickness=2,
+                                    font_scale=0.8)
+            out.write(image)
+            count += 1
+
+            if count >= num_warmup:
+                pure_inf_time += time.time() - prev_time
+                model_fps = (count + 1 - num_warmup) / pure_inf_time
+                print(f'\rProcessing frame: {count + 1}/{num_frames} | Current FPS: {model_fps}',end='')
+        else:
+            break
     out.release()
+    cap.release()
+    # cv2.destroyAllWindows()
 
 
 def _parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--sequence_path', type=str, required=True,
-                        help="Path to the sequence.")
+    parser.add_argument('--inp_vid_path', type=str, required=False,
+                        default='/home/heh3kor/vaccum_thon/test/test_video.mp4',
+                        help="Path to the video.")
     parser.add_argument('--out_dir', type=str, required=False, default='output_videos',
                         help="Output directory.")
-    parser.add_argument('--score_threshold', type=float, required=False, default=0.35,
+    parser.add_argument('--score_threshold', type=float, required=False, default=0.45,
                         help="Score threshold for filtering detections.")
     parser.add_argument('--fps', type=int, required=False, default=15,
                         help="Output video FPS.")
@@ -73,11 +91,11 @@ def main():
     cfg = get_config()
     detector = Detector(cfg)
 
-    frames = glob(os.path.join(args.sequence_path, '*'))
+    # frames = glob(os.path.join(args.sequence_path, '*'))
 
     make_video(
         detector,
-        frames,
+        args.inp_vid_path,
         args.out_dir,
         args.score_threshold,
         args.fps,
